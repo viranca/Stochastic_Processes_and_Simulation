@@ -54,7 +54,7 @@ for i in range (1,1000):
             current_room = X[5]
             
         chain.append(current_room)
-    T4.append(chain[2])
+    T4.append(chain[1])
 
 
 print(chain)
