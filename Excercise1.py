@@ -20,12 +20,12 @@ b) the expected number of eVTOLs arriving from region i = 3 between 9:30- 11:30.
 c) the total expected delay and the variance of the total delay during 9:30-11:30.
 d) a 95% confidence interval of the total expected delay.
 '''
-for i in range(10):
+#get arrival times using a sorted uniform distribution
+probcount=0
+n=100
+for i in range(n):
     arr = np.round(sorted(np.random.uniform(0, 120, 20)))
-
-#print(arr)
     while i in range(len(arr) ):
-
         if arr[i-1] == arr[i]:
             arr[i] += 2
             arr=sorted(arr)
@@ -36,5 +36,16 @@ for i in range(10):
             i=0
         arr=sorted(arr)
         i+=1
+    #print(arr)
+    #9.45-10.15 = 15-45min after 9.30
+    count=0
 
-    print(arr)
+    for i in range(len(arr)):
+        if arr[i]>=15 and arr[i]<=45:
+            count+=1
+    if count>=6:
+        probcount+=1
+    #print(count)
+#print("probcount",probcount)
+#probability of more than 6
+print("a): prob",probcount/n)
