@@ -37,3 +37,58 @@ Hint for Python users:
 • scipy.special.gamma(x) : to get the value of Gamma function Γ(x).
 • pandas.read csv(open(file directory, ‘r’)).values : to read csv file.
 """""
+import pandas as pd
+
+
+with open('data.csv', 'r') as f:
+    df = pd.read_csv(f, sep=',', header=0)
+    data = df.values
+    
+print(data)    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
