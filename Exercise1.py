@@ -24,7 +24,7 @@ c) the total expected delay and the variance of the total delay during 9:30-11:3
 d) a 95% confidence interval of the total expected delay.
 '''
 #set number of simulations
-n = 5000
+n = 100
 # initialise
 binwidth=0.4
 totaldelay = 0
