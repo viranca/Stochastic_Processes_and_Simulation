@@ -38,23 +38,124 @@ Hint for Python users:
 • pandas.read csv(open(file directory, ‘r’)).values : to read csv file.
 """""
 import pandas as pd
+from scipy.stats import gamma
+import matplotlib.pyplot as plt
+import scipy
+
+import numpy as np
 
 
 with open('data.csv', 'r') as f:
     df = pd.read_csv(f, sep=',', header=0)
-    data = df.values
+    data = df
+
+#%%
+#Create seperate dataframes for each brake.
+#And create a list of the v values for each brake, for each flight cycle.
+brake_1 = data['Brake-1']
+brake_1_v = []
+for i in range(len(brake_1) - 1):
+    v_i = brake_1[i + 1] - brake_1[i]
+    brake_1_v.append(v_i)
     
-print(data)    
+brake_2 = data['Brake-2']
+brake_2_v = []
+for i in range(len(brake_2) - 1):
+    v_i = brake_2[i + 1] - brake_2[i]
+    brake_2_v.append(v_i)
+    
+brake_3 = data['Brake-3']
+brake_3_v = []
+for i in range(len(brake_3) - 1):
+    v_i = brake_3[i + 1] - brake_3[i]
+    brake_3_v.append(v_i)
+    
+brake_4 = data['Brake-4']
+brake_4_v = []
+for i in range(len(brake_4) - 1):
+    v_i = brake_4[i + 1] - brake_4[i]
+    brake_4_v.append(v_i)
+    
+brake_5 = data['Brake-5']
+brake_5_v = []
+for i in range(len(brake_5) - 1):
+    v_i = brake_5[i + 1] - brake_5[i]
+    brake_5_v.append(v_i)
+    
+brake_6 = data['Brake-6']
+brake_6_v = []
+for i in range(len(brake_6) - 1):
+    v_i = brake_6[i + 1] - brake_6[i]
+    brake_6_v.append(v_i)
+    
+brake_7 = data['Brake-7']
+brake_7_v = []
+for i in range(len(brake_7) - 1):
+    v_i = brake_7[i + 1] - brake_7[i]
+    brake_7_v.append(v_i)
+    
+brake_8 = data['Brake-8']
+brake_8_v = []
+for i in range(len(brake_8) - 1):
+    v_i = brake_8[i + 1] - brake_8[i]
+    brake_8_v.append(v_i)
+
+#%%
 
 
+#Combine all brake dataframes into a single column, combining the data.
+all_brakes_combined = pd.concat([brake_1, brake_2, brake_3, brake_4, brake_5, brake_6, brake_7, brake_8])
+
+all_brakes_v_combined = brake_1_v + brake_2_v + brake_3_v + brake_4_v + brake_5_v + brake_6_v + brake_7_v + brake_8_v
+#all_brakes_v_combined.sort()
+#print(all_brakes_v_combined)
+
+all_brakes_v_combined = pd.DataFrame(all_brakes_v_combined)
+
+#Calculating the mean and variance   
+x = all_brakes_v_combined
+
+#alpha and beta computed by the method of moments. NOT USED!
+mean = x.mean()
+var  = x.var()
+alpha_MOM = (mean**2)/var
+beta_MOM  = mean / alpha_MOM
 
 
+#%%
+#alpha and beta computed by gamma.fit , which uses maximum likelihood method:
+alpha, mu_gamma, beta = gamma.fit(x, floc=0)
+
+print( 'Alpha:', alpha, 'Beta:', beta) 
+#print(alpha_MOM, beta_MOM)
+# https://homepage.divms.uiowa.edu/~mbognar/applets/gamma.html
 
 
+#Create a plot with randomly generated datapoints from the found distribution.
+generated_points = []
+for i in range(10000):
+    random_value_from_distribution = np.random.gamma(shape=alpha, scale=beta)
+    generated_points.append(random_value_from_distribution)
+    i = i + 1
+generated_points.sort()
+plt.plot(generated_points)
+plt.show()
 
 
-
-
+#Monte carlo, determining the mean time to failure.
+number_of_cycles_before_failure_list = []
+for i in range(10000):
+    x_i = 0
+    number_of_cycles_before_failure = 0
+    while x_i < 1:
+        number_of_cycles_before_failure = number_of_cycles_before_failure + 1
+        random_value_from_distribution = np.random.gamma(shape=alpha, scale=beta)
+        x_i = x_i + random_value_from_distribution
+    number_of_cycles_before_failure_list.append(number_of_cycles_before_failure)    
+    i = i + 1
+    
+#print(number_of_cycles_before_failure_list)
+print(np.mean(number_of_cycles_before_failure_list))
 
 
 
