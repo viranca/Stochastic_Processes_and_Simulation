@@ -2,6 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy.stats import anderson
 from math import sqrt
+import random
 '''
 eVTOLs arriving at a hub (20pcts)
 At a vertiport, eVTOLs from 6 surrounding regions arrive. 
@@ -26,15 +27,16 @@ d) a 95% confidence interval of the total expected delay.
 #set number of simulations
 n = 50000
 # initialise
-binwidth=0.4
 totaldelay = 0
 a=0
 probcount = 0
 delaylist=[]
 cofv=[]
 xforplot=[]
-# get arrival times using a sorted uniform distribution
+from3count=0
+
 for i in range(n):
+    # get arrival times using a sorted uniform distribution
     arr = np.round(sorted(np.random.uniform(0, 120, 20)))
     arr0=arr
     while i in range(len(arr)):
@@ -48,8 +50,15 @@ for i in range(n):
             i = 0
         arr = sorted(arr)
         i += 1
-    a+=1
+
+    #from region 3 calculations
+    list=[0,1]
+    fromreg3=random.choices(list, weights=(70,30), k=20)
+    reg3count=sum(fromreg3)
+    from3count+=reg3count
+
     # delay calculations
+    a+=1
     delay=sum(arr-arr0)
     delaylist.append(delay)
     totaldelay+=delay
@@ -65,6 +74,7 @@ for i in range(n):
     #var=(sum(delaylist[b]-avgtotaldelay for b in range(a)))
     #print('var',var)
     #print('cofv',cofv)
+
     # for a) 9.45-10.15 = 15-45min after 9.30
     count = 0
     for j in range(len(arr)):
@@ -79,7 +89,9 @@ print("a): prob", probcount/n)
 # prob eVTOLs of region 3 between 9.30-11.30
 # approx 20 from allover
 from3 = 0.3 * 20
-print("b)", from3)
+evtolsfrom3=from3count/n
+print("b) evtolsfrom3",int(evtolsfrom3))
+print("b) check", from3)
 print("c) avg total delay", totaldelay/n)
 print("c) var total delay", var)
 result=anderson(delaylist)
