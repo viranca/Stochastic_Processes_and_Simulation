@@ -1,49 +1,24 @@
-"""""
-Consider an aircraft brake whose condition degrades after every flight cycles. 
-Let Xi denote the degradation level of the brake after ith flight cycle. 
-Xi = 0 implies that the brake has no degradation (is new). As soon as Xi ≥ 1, the 
-degradation level of the brake exceeds a predefined threshold D = 1, the brake becomes 
-inoperable and it must be replaced. After each flight cycle, the degradation level 
-increases following the difference equation:
-Xi+1 = Xi + ν
-where ν is a random variable following a Gamma distribution with shape parameter 
-α and scale parameter β, i.e., ν ∼ Gamma(α, β). The probability density function (pdf) of Gamma(α, β) is:
 
-a) In the file data.csv you are given historical data on the degradation of same- type 8 brakes of an aircraft 
-during 100 flight cycles. Figure 2 plots this data. Your brake is of the same type as the 8 brakes. 
-You know that the brakes degrade following Gamma(α, β).
-Estimate parameters α and β using the data in data.csv and a maximum likelihood estimator (MLE). 
-In the data.csv file, each column corresponds to one brake. Assume that all brake follows Gamma(α,β) 
-with the same parameters. MLE of a Gamma distribution is explained in Additional 
-Document MLE for Assignment 1 (Brightspace → Assignment 1 → Additional Document MLE) and in Tutorial 2.
-With the estimated α and β, use Monte Carlo simulation to determine the expected number of flight cycles 
-that the component can make before Xi ≥ 1 (we call this the MeanTimeToFailure).
+"""
+=============================================================================
+Assignment 1 Exercise 2
+=============================================================================
+"""
 
-For the next exercises, use the parameters α = 0.3 and β = 0.02.
-b) Determine the expected degradation level of a brake after 50 flight cycles, given that X0 = 0.1. 
-Use Monte Carlo simulation with 100, 10.000, 1.000.000 simulation runs. Determine the confidence 
-interval for these expected degrada- tion levels. What do you observe?
-c) We replace the considered brake after it completes 160 flight cycles since its last replacement, 
-i.e., scheduled replacement. If the brake becomes inop- erable after ith flight cycle (Xi ≥ 1), 
-we replace the brake immediately, i.e., unscheduled replacement. Because an unscheduled replacement 
-causes delays and extra maintenance cost, it is not desired. Use Monte Carlo simulations to determine 
-the following properties: (1) the mean number of flight cycles com- pleted by a brake before it is 
-replaced (both scheduled and unscheduled), (2) the ratio between the number of unscheduled replacements 
-and the number of all replacements (both scheduled and unscheduled) during 1.000 flight cycles. 
-Assume that we have a new brake at the beginning, i.e., X0 = 0.3
-
-Hint for Python users:
-• numpy.random.gamma(shape=α, scale=β) : to generate a random variable following the Gamma distribution.
-• scipy.special.gamma(x) : to get the value of Gamma function Γ(x).
-• pandas.read csv(open(file directory, ‘r’)).values : to read csv file.
-"""""
 import pandas as pd
 from scipy.stats import gamma
 import matplotlib.pyplot as plt
 import scipy
-
+import math
 import numpy as np
+import statistics
 
+
+"""
+=============================================================================
+Data preparation
+=============================================================================
+"""
 
 with open('data.csv', 'r') as f:
     df = pd.read_csv(f, sep=',', header=0)
@@ -102,6 +77,11 @@ for i in range(len(brake_8) - 1):
 
 #%%
 
+"""
+=============================================================================
+Part a: Maximum likelihood estimation, finding alpha and beta. 
+=============================================================================
+"""
 
 #Combine all brake dataframes into a single column, combining the data.
 all_brakes_combined = pd.concat([brake_1, brake_2, brake_3, brake_4, brake_5, brake_6, brake_7, brake_8])
@@ -120,18 +100,60 @@ mean = x.mean()
 var  = x.var()
 alpha_MOM = (mean**2)/var
 beta_MOM  = mean / alpha_MOM
+#print('Method of Moments', alpha_MOM, beta_MOM)
+
+
+#alpha and beta computed by gamma.fit , which uses maximum likelihood method:
+alpha_fit, mu_gamma, beta_fit = gamma.fit(x, floc=0)
+#print('gamma.fit', alpha_fit, beta_fit)
+
+
+#implement an algorithmn to find the MLE (using the variable names from the assignment):
+mean_y = x.mean()
+log_mean_y = math.log(mean_y) #log(y_bar)
+
+log_y = []
+for i in range(len(x)):
+    log_y.append(math.log(x[0][i]))
+    i =+ 1
+mean_log_y = statistics.mean(log_y) ##(log(y)_bar)
+
+n = len(x)
+
+log_likelihood_list = []
+
+xforplot = np.arange(0.001, 1, 0.0001)
+for alpha_i in xforplot:
+    log_likelihood = n*(alpha_i -1)*mean_log_y -n*alpha_i - n*math.log(scipy.special.gamma(alpha_i)) \
+        - n*alpha_i*log_mean_y + n*alpha_i*math.log(alpha_i)
+    log_likelihood_list.append(log_likelihood)
+    
+max_log_likelihood = max(log_likelihood_list)
+alpha_MLE = xforplot[log_likelihood_list.index(max_log_likelihood)]
+
+beta_MLE  = mean_y[0]/alpha_MLE
+
+print('MLE', 'alpha ' ,alpha_MLE, '  beta ' , beta_MLE)
+
+plt.plot(xforplot, log_likelihood_list)
+plt.xlabel('alpha')
+plt.ylabel('log_likelihood')
+plt.show()
 
 
 #%%
-#alpha and beta computed by gamma.fit , which uses maximum likelihood method:
-alpha, mu_gamma, beta = gamma.fit(x, floc=0)
 
-print( 'Alpha:', alpha, 'Beta:', beta) 
-#print(alpha_MOM, beta_MOM)
-# https://homepage.divms.uiowa.edu/~mbognar/applets/gamma.html
 
+"""
+=============================================================================
+Small intermezzo to visualize the found distribution.
+=============================================================================
+"""
 
 #Create a plot with randomly generated datapoints from the found distribution.
+alpha = alpha_MLE
+beta = beta_MLE
+
 generated_points = []
 for i in range(10000):
     random_value_from_distribution = np.random.gamma(shape=alpha, scale=beta)
@@ -142,6 +164,11 @@ plt.plot(generated_points)
 plt.show()
 
 
+"""
+=============================================================================
+Part a: monte carlo to find the expected number of flights before x_i>1
+=============================================================================
+"""
 #Monte carlo, determining the mean time to failure.
 number_of_cycles_before_failure_list = []
 for i in range(10000):
@@ -155,31 +182,77 @@ for i in range(10000):
     i = i + 1
     
 #print(number_of_cycles_before_failure_list)
-print(np.mean(number_of_cycles_before_failure_list))
+print(' expected number of flights before x_i>1: ' , np.mean(number_of_cycles_before_failure_list))
 
 
 
+#%%
+"""
+=============================================================================
+Part b: Expected degradation after 50 flights (X_50) for 100, 10.000 and 1.000.000 runs
+=============================================================================
+"""
+
+X_50_list = []
+for MC_i in range(1000001): #monte carlo iterations
+    x_i = 0.1
+    for i in range(51):
+        random_value_from_distribution = np.random.gamma(shape=alpha, scale=beta)
+        x_i = x_i + random_value_from_distribution
+    X_50_list.append(x_i)
+    if MC_i == 100:
+        print('100 simulations X_50 = ', statistics.mean(X_50_list))
+    if MC_i == 10000:
+        print('10000 simulations X_50 = ', statistics.mean(X_50_list))
+    if MC_i == 1000000:
+        print('1000000 simulations X_50 = ', statistics.mean(X_50_list))        
 
 
 
+#%%
+
+"""
+=============================================================================
+Part C:  
+=============================================================================
+"""
 
 
 
+flight_cycle_counter_list = [] 
+for MC_i in range(10000):
+    x_i = 0
+    flight_cycle_counter = 0
+    while x_i < 1:
+        flight_cycle_counter = flight_cycle_counter + 1
+        random_value_from_distribution = np.random.gamma(shape=alpha, scale=beta)
+        x_i = x_i + random_value_from_distribution
+    flight_cycle_counter_list.append(flight_cycle_counter)    
+    MC_i = MC_i + 1
+    
+#%% part one
+for i in range(len(flight_cycle_counter_list)):
+    if flight_cycle_counter_list[i] > 160:
+        flight_cycle_counter_list[i] = 160
+
+mean_flight_cycles_scheduled_and_unscheduled = statistics.mean(flight_cycle_counter_list)
+print('mean_flight_cycles_scheduled_and_unscheduled: ' ,mean_flight_cycles_scheduled_and_unscheduled)
+
+#%% part two
+
+number_of_all_replacements = len(flight_cycle_counter_list)
+
+unscheduled_replacement_list = []
+for i in range(len(flight_cycle_counter_list)):
+    if flight_cycle_counter_list[i] < 160:
+        unscheduled_replacement_list.append(flight_cycle_counter_list[i])
+
+number_of_unscheduled_replacements = len(unscheduled_replacement_list)
 
 
+Ratio_unscheduled_over_all_replacements = number_of_unscheduled_replacements/number_of_all_replacements
 
-
-
-
-
-
-
-
-
-
-
-
-
+print('Ratio_unscheduled_over_all_replacements: ', Ratio_unscheduled_over_all_replacements)
 
 
 
