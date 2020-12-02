@@ -95,6 +95,7 @@ all_brakes_v_combined = pd.DataFrame(all_brakes_v_combined)
 #Calculating the mean and variance   
 x = all_brakes_v_combined
 
+##Below are three different ways for finding alpha and beta
 #alpha and beta computed by the method of moments. NOT USED!
 mean = x.mean()
 var  = x.var()
@@ -108,7 +109,7 @@ alpha_fit, mu_gamma, beta_fit = gamma.fit(x, floc=0)
 #print('gamma.fit', alpha_fit, beta_fit)
 
 
-#implement an algorithmn to find the MLE (using the variable names from the assignment):
+#alpha and beta computed by implementation of an algorithmn to find the MLE (using the variable names from the assignment):
 mean_y = x.mean()
 log_mean_y = math.log(mean_y) #log(y_bar)
 
@@ -216,8 +217,6 @@ for MC_i in range(1000001): #monte carlo iterations
 Part C:  
 =============================================================================
 """
-
-
 
 flight_cycle_counter_list = [] 
 for MC_i in range(10000):
