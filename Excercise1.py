@@ -1,6 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy.stats import anderson
+from scipy import stats
 from math import sqrt
 import random
 '''
@@ -25,7 +26,7 @@ c) the total expected delay and the variance of the total delay during 9:30-11:3
 d) a 95% confidence interval of the total expected delay.
 '''
 #set number of simulations
-n = 50000
+n = 999999
 # initialise
 totaldelay = 0
 a=0
@@ -39,6 +40,7 @@ for i in range(n):
     # get arrival times using a sorted uniform distribution
     arr = np.round(sorted(np.random.uniform(0, 120, 20)))
     arr0=arr
+    # delay arrivals if they are too close together
     while i in range(len(arr)):
         if arr[i-1] == arr[i]:
             arr[i] += 2
@@ -51,9 +53,9 @@ for i in range(n):
         arr = sorted(arr)
         i += 1
 
-    #from region 3 calculations
+    #from region 3, probability =0.3 -> weitht 30
     list=[0,1]
-    fromreg3=random.choices(list, weights=(70,30), k=20)
+    fromreg3=random.choices(list, weights=(70,30), k=len(arr))
     reg3count=sum(fromreg3)
     from3count+=reg3count
 
@@ -65,6 +67,7 @@ for i in range(n):
     #print('totdel',totaldelay)
     avgtotaldelay=totaldelay/a
     #print('avg', avgtotaldelay)
+    # calculate variance and standard deviation
     for b in range(a):
         avar=(delaylist[b]-avgtotaldelay)**2
     var=avar/a
@@ -86,29 +89,44 @@ for i in range(n):
 #print(delaylist)
 # probability of more than 6
 print("a): prob", probcount/n)
-# prob eVTOLs of region 3 between 9.30-11.30
-# approx 20 from allover
+# sanity check: prob eVTOLs of region 3 between 9.30-11.30 approx 20 from allover
 from3 = 0.3 * 20
 evtolsfrom3=from3count/n
-print("b) evtolsfrom3",int(evtolsfrom3))
-print("b) check", from3)
+print("b) evtols from region 3",int(evtolsfrom3))
+print("b) sanity check", from3)
 print("c) avg total delay", totaldelay/n)
 print("c) var total delay", var)
-result=anderson(delaylist)
-print('Statistic: %.3f' % result.statistic)
-p = 0
-for i in range(len(result.critical_values)):
-    sl, cv = result.significance_level[i], result.critical_values[i]
-    if result.statistic < result.critical_values[i]:
-        print('%.3f: %.3f, data looks normal (fail to reject H0: data is normal distributed)' % (sl, cv))
-    else:
-        print('%.3f: %.3f, data does not look normal (reject H0: data is normal distributed)' % (sl, cv))
+
+# Normality check for delay data
+# using the Q-Q plot
+data_1 = sorted(delaylist)
+data_2 = stats.norm.rvs(size=1000, random_state=1)
+plt.style.use('seaborn-whitegrid')
+fig, axes = plt.subplots(2, 2, figsize=(6, 4))
+stats.probplot(data_1, dist=stats.norm, plot=axes[0, 0])
+stats.probplot(data_2, dist=stats.norm, plot=axes[0, 1])
+axes[0, 0].set_title('Normal Q-Q plot')
+axes[0, 1].set_title('Normal Q-Q plot')
+axes[1, 0].hist(data_1, density=True, bins='auto')
+axes[1, 1].hist(data_2, density=True, bins='auto')
+fig.tight_layout()
+# or using Anderson Darling test
+# result=anderson(delaylist)
+# print('Statistic: %.3f' % result.statistic)
+# p = 0
+# for i in range(len(result.critical_values)):
+#     sl, cv = result.significance_level[i], result.critical_values[i]
+#     if result.statistic < result.critical_values[i]:
+#         print('%.3f: %.3f, data looks normal (fail to reject H0)' % (sl, cv))
+#     else:
+#         print('%.3f: %.3f, data does not look normal (reject H0)' % (sl, cv))
 # not normally distributed so we will use the central limit theorem
 # how large must n be: stabilising coefficient of variance cofv
-plt.plot(xforplot, cofv)
-plt.xlabel('nr. of simulations')
-plt.ylabel('coefficient of variation')
+# plt.plot(xforplot, cofv)
+# plt.xlabel('nr. of simulations')
+# plt.ylabel('coefficient of variation')
 plt.show()
+#confidence interval
 # xbar-s/sqrt(n)*z_(alpha/2), xbar+s/sqrt(n)*z_(alpha/2),
 lb = totaldelay/n-stdev/sqrt(n)*1.96
 ub = totaldelay/n+stdev/sqrt(n)*1.96
