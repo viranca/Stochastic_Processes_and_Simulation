@@ -14,6 +14,7 @@ import numpy as np
 import statistics
 
 
+#%%
 """
 =============================================================================
 Data preparation
@@ -156,13 +157,19 @@ alpha = alpha_MLE
 beta = beta_MLE
 
 generated_points = []
+
 for i in range(10000):
     random_value_from_distribution = np.random.gamma(shape=alpha, scale=beta)
     generated_points.append(random_value_from_distribution)
     i = i + 1
+    
 generated_points.sort()
+generated_points.reverse()
 plt.plot(generated_points)
+plt.xlabel('n')
+plt.ylabel('Output gamma function')
 plt.show()
+
 
 
 """
@@ -172,7 +179,7 @@ Part a: monte carlo to find the expected number of flights before x_i>1
 """
 #Monte carlo, determining the mean time to failure.
 number_of_cycles_before_failure_list = []
-for i in range(10000):
+for i in range(1000):
     x_i = 0
     number_of_cycles_before_failure = 0
     while x_i < 1:
@@ -208,18 +215,56 @@ for MC_i in range(1000001): #monte carlo iterations
     if MC_i == 1000000:
         print('1000000 simulations X_50 = ', statistics.mean(X_50_list))        
 
+#%%
 
+"""
+=============================================================================
+Some statistics and plots
+=============================================================================
+"""
+
+X_50_list_100 = X_50_list[0:100]
+X_50_list_10000 = X_50_list[0:10000]
+X_50_list_1000000 = X_50_list[0:10000000]
+print('100 simulations X_50 stdev = ', statistics.stdev(X_50_list_100))
+print('100000 simulations X_50 stdev= ', statistics.stdev(X_50_list_10000))
+print('1000000 simulations X_50 stdev= ', statistics.stdev(X_50_list_1000000))
+
+plt.hist(X_50_list_100)
+plt.xlabel('i')
+plt.ylabel('x_50_i')
+plt.show()
+
+plt.hist(X_50_list_10000)
+plt.ylabel('i')
+plt.xlabel('x_50_i')
+plt.show()
+
+plt.hist(X_50_list_1000000)
+plt.ylabel('i')
+plt.xlabel('x_50_i')
+plt.show()
+
+plt.hist(X_50_list)
+plt.ylabel('i')
+plt.xlabel('x_50_i')
+plt.show()
+
+from statsmodels.graphics.gofplots import qqplot
+X_50_list_df = pd.DataFrame(X_50_list)
+qqplot(X_50_list_df, line='s')
+plt.show()
 
 #%%
 
 """
 =============================================================================
-Part C:  
+Part C: Monte carlo 1000 flights experiment  
 =============================================================================
 """
 
 flight_cycle_counter_list = [] 
-for MC_i in range(10000):
+for MC_i in range(100000):
     x_i = 0
     flight_cycle_counter = 0
     while x_i < 1:
@@ -248,11 +293,11 @@ for i in range(len(flight_cycle_counter_list)):
 
 number_of_unscheduled_replacements = len(unscheduled_replacement_list)
 
+print('number_of_unscheduled_replacements',statistics.mean(unscheduled_replacement_list))
 
 Ratio_unscheduled_over_all_replacements = number_of_unscheduled_replacements/number_of_all_replacements
 
 print('Ratio_unscheduled_over_all_replacements: ', Ratio_unscheduled_over_all_replacements)
-
 
 
 
