@@ -2,6 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy.stats import anderson
 from scipy import stats
+from scipy.stats import variation
 from math import sqrt
 import statistics
 import random
@@ -27,7 +28,7 @@ c) the total expected delay and the variance of the total delay during 9:30-11:3
 d) a 95% confidence interval of the total expected delay.
 '''
 #set number of simulations
-n = 90000
+n = 100
 
 # initialise lists and counters
 totaldelay = 0
@@ -120,8 +121,10 @@ print("mean delay", mean)
 print("c) var total delay", var)
 # sanity check using built in function
 stdev_delay=statistics.stdev(delaylist)
-#print(stdev_delay, stdev_delay**2)
+print(stdev_delay, stdev_delay**2)
 
+cofv1= variation(delaylist)
+print(cofv1)
 # Normality check for delay data
 # using the Q-Q plot
 # data_1 = sorted(delaylist)
@@ -159,5 +162,4 @@ plt.show()
 lb = totaldelay/n-stdev_delay/sqrt(n)*1.96
 ub = totaldelay/n+stdev_delay/sqrt(n)*1.96
 print("d) conf interval total delay", lb,ub)
-
 
