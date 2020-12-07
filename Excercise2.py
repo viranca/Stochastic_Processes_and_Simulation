@@ -81,6 +81,7 @@ for i in range(len(brake_8) - 1):
 """
 =============================================================================
 Part a: Maximum likelihood estimation, finding alpha and beta. 
+Variable names are self explanatory.
 =============================================================================
 """
 
@@ -260,6 +261,7 @@ plt.show()
 """
 =============================================================================
 Part C: Monte carlo 1000 flights experiment  
+Variable names are self explanatory.
 =============================================================================
 """
 
