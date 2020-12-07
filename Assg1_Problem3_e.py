@@ -20,10 +20,29 @@ def Intruderpath():
     X = [] #list of states(rooms) visited by intruder
     S = [] #list of times spent in each state
     #initialize the chain X_0 = 1
-    current_state = 1
+    
+    #-----Add this part when the intruder can enter by climbing the outer walls, 
+    #otherwise 
+    #current_state=1
+    omegai = np.random.uniform(0,1)
+    if omegai<=1/7:
+        current_state = 1
+    elif omegai<=2/7:
+        current_state = 2
+    elif omegai<=3/7:
+        current_state = 3
+    elif omegai<=4/7:
+        current_state = 4
+    elif omegai<=5/7:
+        current_state = 6
+    elif omegai<=6/7:
+        current_state = 7
+    else:
+        current_state = 8
+    
     t = 0
     while it1<it:
-        while t<100:
+        while t<400:
             
             #Draw omega
             omega = np.random.uniform(0,1)
