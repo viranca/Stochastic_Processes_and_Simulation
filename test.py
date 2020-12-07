@@ -28,7 +28,7 @@ c) the total expected delay and the variance of the total delay during 9:30-11:3
 d) a 95% confidence interval of the total expected delay.
 '''
 #set number of simulations
-n = 100
+n = 99000
 
 # initialise lists and counters
 totaldelay = 0
@@ -38,6 +38,14 @@ delaylist=[]
 cofv=[]
 xforplot=[]
 from3count=0
+from3list=[]
+cofv3=[]
+c=0
+d=0
+arrivalcount=[]
+arrivals=0
+cofvarr=[]
+
 
 for i in range(n):
     # get arrival times using a sorted uniform distribution
@@ -64,6 +72,18 @@ for i in range(n):
     reg3count = sum(fromreg3)
     from3count += reg3count
 
+    # calculate variance and standard deviation for from region3
+    from3list.append(reg3count)
+    c+=1
+    varlist1 = []
+    avgfromreg3=from3count/c
+    for b in range(c):
+        cvar = (from3list[b] - avgfromreg3) ** 2
+        varlist1.append(cvar)
+    var3 = sum(varlist1) / c
+    stdev3 = sqrt(var3)
+    cofv3.append(stdev3 / avgfromreg3)
+
     # delay calculations
     a+=1
     delay=sum(arr-arr0)
@@ -73,20 +93,19 @@ for i in range(n):
     avgtotaldelay=totaldelay/a
     # print('avg', avgtotaldelay)
 
-    # calculate variance and standard deviation
+    # calculate variance and standard deviation for delay
     varlist=[]
     for b in range(a):
         avar=(delaylist[b]-avgtotaldelay)**2
         varlist.append(avar)
     var=sum(varlist)/a
-    stdev=sqrt(var)
+    stdev_delay=sqrt(var)
     #print('var',var)
     #print('stdev',stdev)
-
     # calculate coefficient of variance
-    cofv.append(stdev/avgtotaldelay)
-    xforplot.append(a)
-    #mean_inloop = statistics.mean(delaylist)
+    cofv.append(stdev_delay/(avgtotaldelay))
+
+    #mean_inloop = statistics.mean(delaylist) # other way to calculate the moving average
     #print('mean_inloop', mean_inloop)
     #print('cofv',cofv)
 
@@ -101,43 +120,33 @@ for i in range(n):
         probcount += 1
     # print(count)
 
-#print(delaylist)
+    #calculating the cofv to determine number of simulations for the arrivalsbetween 9.45 and 10.15
+    arrivalcount.append(count)
+    arrivals+=count
+    d += 1
+    varlistarr = []
+    avgarr = arrivals / d
+    for b in range(d):
+        dvar = (arrivalcount[b] - avgarr) ** 2
+        varlistarr.append(dvar)
+    vararr = sum(varlist1) / c
+    stdevarr = sqrt(vararr)
+    cofvarr.append(stdevarr / avgarr)
 
-# divide counter of simulations of 6 or more arrivals between 9.45 and 10.15 by total nr of simulations to get probability
-print("a): prob", probcount/n)
-
-# divide the totals by the number of simulation
-evtolsfrom3=from3count/n
-print("b) evtols from region 3:",int(evtolsfrom3))
-# sanity check: prob eVTOLs of region 3 between 9.30-11.30 times approx 20 arriving in total per sim
-from3 = 0.3 * 20
-#print("b) sanity check", from3)
-
-print("c) avg total delay", totaldelay/n)
-# sanity check using built in function
-mean = statistics.mean(delaylist)
-print("mean delay", mean)
-
-print("c) var total delay", var)
-# sanity check using built in function
-stdev_delay=statistics.stdev(delaylist)
-print(stdev_delay, stdev_delay**2)
-
-cofv1= variation(delaylist)
-print(cofv1)
+"""----------------- plotting coefficients of variance and QQ + Anderson -----------------"""
 # Normality check for delay data
 # using the Q-Q plot
-# data_1 = sorted(delaylist)
-# data_2 = stats.norm.rvs(size=1000, random_state=1)
-# plt.style.use('seaborn-whitegrid')
-# fig, axes = plt.subplots(2, 2, figsize=(6, 4))
-# stats.probplot(data_1, dist=stats.norm, plot=axes[0, 0])
-# stats.probplot(data_2, dist=stats.norm, plot=axes[0, 1])
-# axes[0, 0].set_title('Normal Q-Q plot')
-# axes[0, 1].set_title('Normal Q-Q plot')
-# axes[1, 0].hist(data_1, density=True, bins='auto')
-# axes[1, 1].hist(data_2, density=True, bins='auto')
-# fig.tight_layout()
+data_1 = sorted(delaylist)
+data_2 = stats.norm.rvs(size=1000, random_state=1)
+plt.style.use('seaborn-whitegrid')
+fig, axes = plt.subplots(2, 2, figsize=(6, 4))
+stats.probplot(data_1, dist=stats.norm, plot=axes[0, 0])
+stats.probplot(data_2, dist=stats.norm, plot=axes[0, 1])
+axes[0, 0].set_title('Delay against Normal Q-Q plot')
+axes[0, 1].set_title('Normal Q-Q plot')
+axes[1, 0].hist(data_1, density=True, bins='auto')
+axes[1, 1].hist(data_2, density=True, bins='auto')
+fig.tight_layout()
 # or using Anderson Darling test
 # result=anderson(delaylist)
 # print('Statistic: %.3f' % result.statistic)
@@ -150,16 +159,40 @@ print(cofv1)
 #         print('%.3f: %.3f, data does not look normal (reject H0)' % (sl, cv))
 # not normally distributed so we will use the central limit theorem
 # how large must n be: stabilising coefficient of variance cofv
+
 x=[]
 for i in range(len(delaylist)):
-    x.append(i)
-plt.plot(x, cofv)
+     x.append(i)
+plt.plot(x, cofv) # coefficient fo variance for delay
+#plt.plot(x,cofv3) # coefficient fo variance for arrivals from region 3
+#plt.plot(x, cofvarr) # coefficient fo variance for arrivals between 9.45 and 10.15
 plt.xlabel('nr. of simulations')
 plt.ylabel('coefficient of variation')
 plt.show()
+
 #confidence interval
 # xbar-s/sqrt(n)*z_(alpha/2), xbar+s/sqrt(n)*z_(alpha/2),
 lb = totaldelay/n-stdev_delay/sqrt(n)*1.96
 ub = totaldelay/n+stdev_delay/sqrt(n)*1.96
+"""-------------print results---------------"""
+# divide counter of simulations of 6 or more arrivals between 9.45 and 10.15 by total nr of simulations to get probability
+print("a): prob", probcount/n)
+
+# divide the totals by the number of simulation
+evtolsfrom3=from3count/n
+print("b) evtols from region 3:",int(evtolsfrom3))
+# sanity check: prob eVTOLs of region 3 between 9.30-11.30 times approx 20 arriving in total per sim
+from3 = 0.3 * 20
+#print("b) sanity check", from3)
+
+#print(delaylist)
+print("c) avg total delay", totaldelay/n)
+# sanity check using built in function
+mean = statistics.mean(delaylist)
+print("mean delay", mean)
+print("c) var total delay", var)
+# sanity check using built in function
+stdev_delay1=statistics.stdev(delaylist)
+print(stdev_delay1, stdev_delay1**2)
 print("d) conf interval total delay", lb,ub)
 
