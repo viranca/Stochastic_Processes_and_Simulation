@@ -31,24 +31,24 @@ d) a 95% confidence interval of the total expected delay.
 n = 500
 
 """--------initialise lists and counters---------"""
-a=0
-c=0
+#for question a)
 d=0
-# for c and d
-totaldelay = 0
-delaylist=[]
-cofv=[]
-#for b
-from3count=0
-from3list=[]
-cofv3=[]
-#for a
 probcount = 0
 arrivalcount=[]
 arrivals=0
 cofvarr=[]
+#for question b)
+c=0
+from3count=0
+from3list=[]
+cofv3=[]
+# for question c) and d)
+a=0
+totaldelay = 0
+delaylist=[]
+cofv=[]
 
-
+"""----------- start simulation ----------------"""
 for x in range(n):
     # get arrival times using a sorted uniform distribution
     arr = np.round(sorted(np.random.uniform(0, 120, 20)))
@@ -124,7 +124,7 @@ for x in range(n):
         probcount += 1
     # print(count)
 
-    #calculating the cofv to determine number of simulations for the arrivalsbetween 9.45 and 10.15
+    #calculating the cofv to determine number of simulations for the arrivals between 9.45 and 10.15
     arrivalcount.append(count)
     arrivals+=count
     d += 1
@@ -137,7 +137,7 @@ for x in range(n):
     stdevarr = sqrt(vararr)
     cofvarr.append(stdevarr / avgarr)
 
-"""----------------- plotting coefficients of variance and QQ + Anderson -----------------"""
+"""----------------- plotting coefficients of variance and QQ plot + Anderson test for normality -----------------"""
 # Normality check for delay data
 # using the Q-Q plot
 data_1 = sorted(delaylist)
@@ -151,6 +151,7 @@ axes[0, 1].set_title('Normal Q-Q plot')
 axes[1, 0].hist(data_1, density=True, bins='auto')
 axes[1, 1].hist(data_2, density=True, bins='auto')
 fig.tight_layout()
+
 # or using Anderson Darling test
 # result=anderson(delaylist)
 # print('Statistic: %.3f' % result.statistic)
@@ -161,9 +162,12 @@ fig.tight_layout()
 #         print('%.3f: %.3f, data looks normal (fail to reject H0)' % (sl, cv))
 #     else:
 #         print('%.3f: %.3f, data does not look normal (reject H0)' % (sl, cv))
-# not normally distributed so we will use the central limit theorem
-# how large must n be: stabilising coefficient of variance cofv
 
+
+# not normally distributed so we will use the central limit theorem
+# how large must n be? ->: stabilising coefficient of variance cofv
+'''-----------cofv in plot--------------'''
+# create x-values
 x=[]
 for i in range(len(delaylist)):
      x.append(i)
@@ -182,7 +186,7 @@ ub = totaldelay/n+stdev_delay/sqrt(n)*1.96
 # divide counter of simulations of 6 or more arrivals between 9.45 and 10.15 by total nr of simulations to get probability
 print("a): prob", probcount/n)
 
-# divide the totals by the number of simulation
+# divide the totals arriving from 3 by the number of simulations
 evtolsfrom3=from3count/n
 print("b) evtols from region 3:",int(evtolsfrom3))
 # sanity check: prob eVTOLs of region 3 between 9.30-11.30 times approx 20 arriving in total per sim
