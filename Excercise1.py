@@ -28,7 +28,7 @@ c) the total expected delay and the variance of the total delay during 9:30-11:3
 d) a 95% confidence interval of the total expected delay.
 '''
 #set number of simulations
-n = 9000
+n = 500
 
 """--------initialise lists and counters---------"""
 a=0
@@ -49,12 +49,13 @@ arrivals=0
 cofvarr=[]
 
 
-for i in range(n):
+for x in range(n):
     # get arrival times using a sorted uniform distribution
     arr = np.round(sorted(np.random.uniform(0, 120, 20)))
     # save the initial arrival times for delay comparison
     arr0 = arr
     # delay arrivals if they are too close together
+    i=0
     while i in range(len(arr)):
         if arr[i-1] == arr[i]:
             arr[i] += 2
@@ -89,6 +90,7 @@ for i in range(n):
     # delay calculations
     a+=1
     delay=sum(arr-arr0)
+    #print(delay)
     delaylist.append(delay)
     totaldelay+=delay
     # print('totdel',totaldelay)
@@ -105,7 +107,7 @@ for i in range(n):
     #print('var',var)
     #print('stdev',stdev)
     # calculate coefficient of variance
-    cofv.append(stdev_delay/(avgtotaldelay+1))
+    cofv.append(stdev_delay/(avgtotaldelay))
 
     #mean_inloop = statistics.mean(delaylist) # other way to calculate the moving average
     #print('mean_inloop', mean_inloop)
@@ -197,5 +199,5 @@ print("c) var total delay", var)
 stdev_delay1=statistics.stdev(delaylist)
 print(stdev_delay1, stdev_delay1**2)
 print("d) conf interval total delay", lb,ub)
-
+#print(delaylist)
 
