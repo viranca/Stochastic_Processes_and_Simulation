@@ -18,16 +18,19 @@ import numpy as np
 import statsmodels.api as sm
 from statsmodels.distributions.empirical_distribution import ECDF
 
-β=1
-σ=2
-n=10000 # change to 10, 100 or 10000 for comparison
+"------ constants and lists ------"
+β=1 # degradation constant
+σ=2 # diffusion coefficient
+n=10 # number of simulations, change to 10, 100 or 10000 for comparison
+
 allruns=[] # list containing values for X_5 of all runs/simulations
 mov_avg=[] # list containing moving average of X_5 needed for coefficient of variation calculations
 mov_stdev=[] # list containing moving standard deviation of X_5 needed for coefficient of variation calculations
 cofv=[0] # list containing the coefficients of variation to determine how many runs are needed until X_5 converges
-for a in range(n):
 
-    # find the brownian B_t+1 by adding N(0, t+1-t) for each increment
+"------ start MC simulation -------"
+for a in range(n):
+    # find the Brownian B_t+1 by adding N(0, t_{i+1}-t_{i}) for each increment
     def Brownian(t):
         B=[0]
         for i in range(t):
@@ -37,11 +40,12 @@ for a in range(n):
             B.append(Bt)
         return (B[-1])
 
-    # compute X_t by adding the degradation drift and diffusion coeff*Brownian
+    # compute X_t by adding the degradation and diffusion coeff*Brownian
     X=[0]
     for t in range(1,6):
         X.append(β*t+σ*Brownian(t))
     # print(X)
+
     # collect value of X_5 in 'all runs' list
     allruns.append(X[-1])
 
@@ -68,33 +72,35 @@ variance=stdev**2
 # plt.ylabel('coefficient of variation')
 # plt.show()
 """------------- plotting the histograms ---------------"""
-#
-# plt.hist(allruns, density=True, bins='auto')
-# plt.xlabel('value of X_5')
-# plt.ylabel('density')
-# plt.show()
+
+plt.hist(allruns, density=True, bins='auto')
+plt.xlabel('value of X_5')
+plt.ylabel('density')
+plt.show()
 
 """------------- plotting the diracs ---------------"""
-ydirac=[]
-for i in range(len(allruns)):
-    ydirac.append(1)
-# plt.stem(allruns,ydirac)
+# ydirac=[]
+# for i in range(len(allruns)):
+#     ydirac.append(1)
+# # # plotting dirac impulses
+# # plt.stem(allruns,ydirac)
+# # plt.show()
+#
+# # # plotting an empirical CDF
+# # ecdf=ECDF(allruns)
+# # plt.plot(ecdf.x,ecdf.y)y
+# # plt.show()
+#
+# # plotting a histogram plus KDE plus stem
+# kde = sm.nonparametric.KDEUnivariate(allruns)
+# kde.fit() # Estimate the densities
+# fig = plt.figure()#figsize=(10, 5)
+# ax = fig.add_subplot(111)
+# # Plot the histogram
+# # ax.hist(allruns, bins=5, density=True, label='Histogram from samples',
+# #         zorder=5, edgecolor='k', alpha=0.5)
+# # Plot the impulses
+# ax.stem(allruns,ydirac)
+# # Plot the KDE as fitted using the default arguments
+# ax.plot(kde.support, kde.density, lw=3, color = 'k', label='KDE from samples', zorder=10)
 # plt.show()
-
-# plotting an empirical CDF
-# ecdf=ECDF(allruns)
-# plt.plot(ecdf.x,ecdf.y)y
-# plt.show()
-
-# plotting a histogram plus KDE
-kde = sm.nonparametric.KDEUnivariate(allruns)
-kde.fit() # Estimate the densities
-fig = plt.figure()#figsize=(10, 5)
-ax = fig.add_subplot(111)
-# Plot the histogram
-# ax.hist(allruns, bins=5, density=True, label='Histogram from samples',
-#         zorder=5, edgecolor='k', alpha=0.5)
-ax.stem(allruns,ydirac)
-# Plot the KDE as fitted using the default arguments
-ax.plot(kde.support, kde.density, lw=3, color = 'k', label='KDE from samples', zorder=10)
-plt.show()
