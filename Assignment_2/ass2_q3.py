@@ -60,8 +60,8 @@ for a in range(n):
 mean = statistics.mean(allruns)
 stdev=statistics.stdev(allruns)
 variance=stdev**2
-# print(mean)
-# print(variance)
+print(mean)
+print(variance)
 
 """------------- plotting the coefficient of variance ---------------"""
 # x=[]
@@ -72,13 +72,14 @@ variance=stdev**2
 # plt.ylabel('coefficient of variation')
 # plt.show()
 """------------- plotting the histograms ---------------"""
-
-plt.hist(allruns, density=True, bins='auto')
-plt.xlabel('value of X_5')
-plt.ylabel('density')
-plt.show()
+"""------------- will be combined later on -------------"""
+# plt.hist(allruns, density=True, bins='auto')
+# plt.xlabel('value of X_5')
+# plt.ylabel('density')
+# plt.show()
 
 """------------- plotting the diracs ---------------"""
+"""------------- will be combined later on ---------"""
 # ydirac=[]
 # for i in range(len(allruns)):
 #     ydirac.append(1)
@@ -86,11 +87,8 @@ plt.show()
 # # plt.stem(allruns,ydirac)
 # # plt.show()
 #
-# # # plotting an empirical CDF
-# # ecdf=ECDF(allruns)
-# # plt.plot(ecdf.x,ecdf.y)y
-# # plt.show()
-#
+"""---------------------- plotting combinations ---------------------"""
+"""-------------- will be plotted side by side later on -------------"""
 # # plotting a histogram plus KDE plus stem
 # kde = sm.nonparametric.KDEUnivariate(allruns)
 # kde.fit() # Estimate the densities
@@ -99,8 +97,34 @@ plt.show()
 # # Plot the histogram
 # # ax.hist(allruns, bins=5, density=True, label='Histogram from samples',
 # #         zorder=5, edgecolor='k', alpha=0.5)
-# # Plot the impulses
+# # Plot the impulses (for this also uncomment line 82-84)
 # ax.stem(allruns,ydirac)
 # # Plot the KDE as fitted using the default arguments
 # ax.plot(kde.support, kde.density, lw=3, color = 'k', label='KDE from samples', zorder=10)
 # plt.show()
+
+""" -------- plotting histogram+KDE and dirac+KDE side by side ----------- """
+plt.subplot(1, 2, 1)
+kde = sm.nonparametric.KDEUnivariate(allruns)
+kde.fit() # Estimate the densities
+
+# Plot the histogram
+plt.hist(allruns, bins=100, density=True, label='Histogram from samples',
+        zorder=5, edgecolor='k', alpha=0.5)
+# plot the KDE as fitted using the default arguments
+plt.plot(kde.support, kde.density, lw=3, color = 'k', label='KDE from samples', zorder=10)
+plt.xlabel('value of X_5')
+plt.ylabel('Probability density')
+
+plt.subplot(1, 2, 2)
+# Plot the impulses
+ydirac=[]
+for i in range(len(allruns)):
+    ydirac.append(1)
+plt.stem(allruns,ydirac)
+# Plot the KDE as fitted using the default arguments
+plt.plot(kde.support, kde.density, lw=3, color = 'k', label='KDE from samples', zorder=10)
+plt.xlabel('value of X_5')
+plt.ylabel('Probability density and unit impulse')
+
+plt.show()
