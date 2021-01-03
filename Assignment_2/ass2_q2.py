@@ -2,6 +2,9 @@ from matplotlib import pyplot as plt
 import statistics
 import numpy as np
 
+
+#part B
+
 #define input matrices A, B, C and V:
 A = np.array([[1, 1],   
               [0, 1]])
@@ -57,10 +60,17 @@ X_3_4 = []
 
 for i in range(100000):
     X_t = np.array([0, 0]) 
-    for i in range(5):
+    
+    #add the timestep here:
+    for t in range(5):
+        #draw new random variables at every timestep t!
         V[0] = np.random.normal(0, 1)
         V[1] = np.random.normal(0, 1) 
+        
+        #compute X_t+1 at every timestep t
         X_tplusone = A * X_t + B + V
+        
+        #Move on to the next timestep t
         X_t = X_tplusone
         X_3_1.append(X_t[0][0])
         X_3_2.append(X_t[0][1])
