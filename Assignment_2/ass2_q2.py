@@ -83,8 +83,10 @@ print(statistics.mean(X_3_2))
 print(statistics.mean(X_3_3))
 print(statistics.mean(X_3_4))
 #%%
+#trying the analytical solution for E[X_3]::
 print(A*A *B + A * B + B)
 
+#trying analytical solution for E[X_2]:
 print(A * B + B)
 
 
