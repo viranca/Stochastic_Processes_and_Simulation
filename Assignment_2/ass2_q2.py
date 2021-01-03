@@ -55,7 +55,7 @@ X_3_4 = []
 
 for i in range(100000):
     X_t = np.array([0, 0]) 
-    for i in range(3):
+    for i in range(5):
         V[0] = np.random.normal(0, 1)
         V[1] = np.random.normal(0, 1) 
         X_tplusone = A * X_t + B + V
@@ -64,6 +64,7 @@ for i in range(100000):
         X_3_2.append(X_t[0][1])
         X_3_3.append(X_t[1][0])
         X_3_4.append(X_t[1][1])
+   
         
 print(statistics.mean(X_3_1))
 print(statistics.mean(X_3_2))
@@ -72,7 +73,7 @@ print(statistics.mean(X_3_4))
 #%%
 print(A*A *B + A * B + B)
 
-
+print(A * B + B)
 
 
 
