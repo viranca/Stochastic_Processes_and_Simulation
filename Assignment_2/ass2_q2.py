@@ -14,7 +14,7 @@ C = np.array([1, 0])
 V = np.array([0, 0])
 
 #number of monte carlo iterations:
-MC_n = 1
+MC_n = 1000
 t_list = []
 for MC_i in range(MC_n):
     X_t = np.array([[0, 0], [0, 0]]) 
@@ -45,8 +45,10 @@ print(statistics.mean(t_list))
 
 
 
-#Checking part A
+
 #%%
+
+#Checking part A
 V = np.array([0, 0])
 X_3_1 = []
 X_3_2 = []
