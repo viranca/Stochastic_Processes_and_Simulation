@@ -57,7 +57,7 @@ X_3_1 = []
 X_3_2 = []
 
 
-for i in range(10000):
+for i in range(100):
     X_t = np.array([[0], [0]]) 
     
     #add the timestep here:
@@ -82,10 +82,6 @@ print(statistics.mean(X_3_2))
 #%%
 #trying the analytical solution for E[X_3]::
 print(np.dot(np.dot(A, A), B) + np.dot(A, B) + B)
-#print(A*A*B + A*B + B)
-
-#trying analytical solution for E[X_2]:
-#print(A * B + B)
 
 
 #%%
@@ -97,27 +93,11 @@ B = np.array([[0.1],
               [0.5]])
 X_3_tot=np.dot(np.dot(A, A), B) + np.dot(A, B) + B
 
-print(np.dot(A, A)*1.8**2 + np.dot(A, B)*1.8 + np.dot(A, B)*1.8 + B**2 + 1 - 1.8**2 )
-print(np.dot(A, X_3_tot)[0]*np.dot(A, X_3_tot)[0]+ np.dot(A, B)[0]*1.8 + np.dot(A, B)[0]*1.8 + B[0]**2 + 1 - 1.8**2)
-# print(np.dot(A, A)*1.8**2 + np.dot(A, B)*1.8 + np.dot(A, B)*1.8 + B**2 + 1 - 1.8**2 )
-# print(np.dot(A, A)*1.8**2 + np.dot(A, B)*1.8 + np.dot(A, B)*1.8 + B**2 + 1 - 1.8**2 )
+#print(X_3_tot)
+print(np.dot(A, X_3_tot)[0]*np.dot(A, X_3_tot)[0] + np.dot(A, B)[0]*1.8 + np.dot(A, B)[0]*1.8 + B[0]**2 + 1 - 1.8**2)
+print(np.dot(A, X_3_tot)[0]*np.dot(A, X_3_tot)[1] + np.dot(A, B)[0]*1.8 + np.dot(A, B)[0]*1.5 + B[0]**2 + 1 - 1.8*1.5)
+print(np.dot(A, X_3_tot)[1]*np.dot(A, X_3_tot)[0] + np.dot(A, B)[0]*1.5 + np.dot(A, B)[0]*1.8 + B[0]**2 + 1 - 1.5*1.8)
+print(np.dot(A, X_3_tot)[1]*np.dot(A, X_3_tot)[1] + np.dot(A, B)[0]*1.5 + np.dot(A, B)[0]*1.5 + B[0]**2 + 1 - 1.5**2)
 
-#%%
-#only first rows
-A = np.array([1, 1])
-B = 0.1 
-print(A**2*1.8**2 + A*B*1.8 + A *B*1.8 + B**2 + 1 - 1.8**2 )
 
-#%%
-#only first collumn of A
-A = np.array([[1],   
-              [0]])
-B = 0.1 
-print(A**2*1.8**2 + A*B*1.8 + A *B*1.8 + B**2 + 1 - 1.8**2 )
-
-#%%
-#only first cells
-A = 1
-B = 0.1 
-print(A**2*1.8**2 + A*B*1.8 + A *B*1.8 + B**2 + 1 - 1.8**2 )
 
