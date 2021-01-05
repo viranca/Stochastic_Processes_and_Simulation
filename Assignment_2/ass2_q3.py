@@ -16,7 +16,7 @@ from matplotlib import pyplot as plt
 import statistics
 import numpy as np
 import statsmodels.api as sm
-from statsmodels.distributions.empirical_distribution import ECDF
+from statsmodels.distributions.empirical_distribution import ECDF # only needed if you want to plot the empirical cdf
 
 "------ constants and lists ------"
 β=1 # degradation constant
@@ -71,14 +71,14 @@ print(variance)
 # plt.xlabel('nr. of simulations')
 # plt.ylabel('coefficient of variation')
 # plt.show()
-"""------------- plotting the histograms ---------------"""
+"""------------- plotting just the histograms ---------------"""
 """------------- will be combined later on -------------"""
 # plt.hist(allruns, density=True, bins='auto')
 # plt.xlabel('value of X_5')
 # plt.ylabel('density')
 # plt.show()
 
-"""------------- plotting the diracs ---------------"""
+"""------------- plotting just the dirac impulses ---------------"""
 """------------- will be combined later on ---------"""
 # ydirac=[]
 # for i in range(len(allruns)):
@@ -87,7 +87,7 @@ print(variance)
 # # plt.stem(allruns,ydirac)
 # # plt.show()
 #
-"""---------------------- plotting combinations ---------------------"""
+"""-------------- plotting combinations of histogram, dirac, kde ---------------------"""
 """-------------- will be plotted side by side later on -------------"""
 # # plotting a histogram plus KDE plus stem
 # kde = sm.nonparametric.KDEUnivariate(allruns)

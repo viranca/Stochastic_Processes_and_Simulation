@@ -57,7 +57,7 @@ X_3_1 = []
 X_3_2 = []
 
 
-for i in range(100000):
+for i in range(10000):
     X_t = np.array([[0], [0]]) 
     
     #add the timestep here:
@@ -95,9 +95,10 @@ A = np.array([[1, 1],
 
 B = np.array([[0.1],
               [0.5]])
+X_3_tot=np.dot(np.dot(A, A), B) + np.dot(A, B) + B
 
 print(np.dot(A, A)*1.8**2 + np.dot(A, B)*1.8 + np.dot(A, B)*1.8 + B**2 + 1 - 1.8**2 )
-
+print(np.dot(A, X_3_tot)[0]*np.dot(A, X_3_tot)[0]+ np.dot(A, B)[0]*1.8 + np.dot(A, B)[0]*1.8 + B[0]**2 + 1 - 1.8**2)
 # print(np.dot(A, A)*1.8**2 + np.dot(A, B)*1.8 + np.dot(A, B)*1.8 + B**2 + 1 - 1.8**2 )
 # print(np.dot(A, A)*1.8**2 + np.dot(A, B)*1.8 + np.dot(A, B)*1.8 + B**2 + 1 - 1.8**2 )
 
